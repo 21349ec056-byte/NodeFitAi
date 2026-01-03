@@ -37,7 +37,7 @@ function ProtectedRoute({ children }) {
 
 // Public Route - redirect to app if already authenticated
 function PublicRoute({ children }) {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, hasProfile, isLoading } = useAuth();
 
   if (isLoading) {
     return (
@@ -47,7 +47,12 @@ function PublicRoute({ children }) {
     );
   }
 
-  return isAuthenticated ? <Navigate to="/app/dashboard" /> : children;
+  // If authenticated, redirect based on profile status
+  if (isAuthenticated) {
+    return hasProfile ? <Navigate to="/app/dashboard" /> : <Navigate to="/onboarding" />;
+  }
+
+  return children;
 }
 
 function AppRoutes() {

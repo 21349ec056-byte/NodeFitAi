@@ -1,49 +1,85 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Inter:wght@300;400;500;600;700&display=swap');
 
 /* ==================== CSS VARIABLES ==================== */
 :root {
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --radius-sm: 6px;
+  --font-sans: 'Google Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --radius-sm: 8px;
   --radius-md: 12px;
-  --radius-lg: 16px;
+  --radius-lg: 20px;
   --sidebar-width: 240px;
   --header-height: 56px;
 }
 
+/* Google Material Design 3 - Dark Theme */
 [data-theme="dark"] {
-  --bg-base: #0f0f0f;
-  --bg-surface: #1a1a1a;
-  --bg-elevated: #252525;
-  --bg-hover: rgba(255, 255, 255, 0.06);
-  --text-primary: #e8e8e8;
-  --text-secondary: #a0a0a0;
-  --text-muted: #6a6a6a;
-  --accent: #6366f1;
-  --accent-light: #818cf8;
-  --accent-glow: rgba(99, 102, 241, 0.25);
-  --success: #34d399;
-  --warning: #fbbf24;
-  --error: #f87171;
-  --border: rgba(255, 255, 255, 0.08);
-  --shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  /* Surface colors - Material Dark */
+  --bg-base: #1a1a1f;
+  --bg-surface: #1f1f24;
+  --bg-elevated: #2b2b30;
+  --bg-hover: rgba(255, 255, 255, 0.08);
+
+  /* Text colors */
+  --text-primary: #e4e4e7;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+
+  /* Google Blue as primary accent */
+  --accent: #8ab4f8;
+  --accent-light: #aecbfa;
+  --accent-dark: #4285f4;
+  --accent-glow: rgba(138, 180, 248, 0.2);
+
+  /* Google semantic colors */
+  --success: #81c995;
+  --warning: #fdd663;
+  --error: #f28b82;
+  --info: #8ab4f8;
+
+  /* Borders and shadows */
+  --border: rgba(255, 255, 255, 0.1);
+  --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 4px 8px 3px rgba(0, 0, 0, 0.15);
+
+  /* Google brand colors for accents */
+  --google-blue: #8ab4f8;
+  --google-red: #f28b82;
+  --google-yellow: #fdd663;
+  --google-green: #81c995;
 }
 
+/* Google Material Design 3 - Light Theme */
 [data-theme="light"] {
-  --bg-base: #f5f5f5;
+  /* Surface colors - Material Light */
+  --bg-base: #f8fafc;
   --bg-surface: #ffffff;
   --bg-elevated: #ffffff;
   --bg-hover: rgba(0, 0, 0, 0.04);
-  --text-primary: #1a1a1a;
-  --text-secondary: #525252;
-  --text-muted: #8a8a8a;
-  --accent: #4f46e5;
-  --accent-light: #6366f1;
-  --accent-glow: rgba(79, 70, 229, 0.15);
-  --success: #10b981;
-  --warning: #f59e0b;
-  --error: #ef4444;
+
+  /* Text colors */
+  --text-primary: #1f1f1f;
+  --text-secondary: #5f6368;
+  --text-muted: #9aa0a6;
+
+  /* Google Blue as primary accent */
+  --accent: #1a73e8;
+  --accent-light: #4285f4;
+  --accent-dark: #1557b0;
+  --accent-glow: rgba(26, 115, 232, 0.12);
+
+  /* Google semantic colors */
+  --success: #1e8e3e;
+  --warning: #f9ab00;
+  --error: #d93025;
+  --info: #1a73e8;
+
+  /* Borders and shadows */
   --border: rgba(0, 0, 0, 0.08);
-  --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+
+  /* Google brand colors for accents */
+  --google-blue: #1a73e8;
+  --google-red: #d93025;
+  --google-yellow: #f9ab00;
+  --google-green: #1e8e3e;
 }
 
 /* ==================== RESET ==================== */
@@ -1815,6 +1851,292 @@ textarea.input-field {
 
 .fade-in {
   animation: fadeIn 0.3s ease-out;
+}
+
+/* ==================== ONBOARDING EXTRAS ==================== */
+.option-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.option-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+}
+
+.option-grid-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.step-indicator {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.habits-section {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.section-subtitle {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0 0 0.25rem;
+}
+
+.small {
+  font-size: 0.75rem;
+}
+
+.mt-1 {
+  margin-top: 0.5rem;
+}
+
+.form-row-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+.option-btn-sm {
+  padding: 0.5rem 0.75rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.15s;
+}
+
+.option-btn-sm:hover {
+  border-color: var(--accent);
+}
+
+.option-btn-sm.selected {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.checkbox-group>label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+}
+
+/* ==================== AI SUMMARY CARD ==================== */
+.summary-card {
+  background: linear-gradient(135deg, var(--accent-glow), rgba(52, 211, 153, 0.1));
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.summary-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--accent);
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.health-score {
+  margin-left: auto;
+  display: flex;
+  align-items: baseline;
+}
+
+.score-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--success);
+}
+
+.score-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.summary-text {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.priority-action {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding: 0.5rem;
+  background: var(--bg-surface);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  color: var(--warning);
+}
+
+/* ==================== WEATHER & AQI CARD ==================== */
+.weather-aqi-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.weather-section {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.weather-section .weather-icon {
+  font-size: 2rem;
+}
+
+.weather-info {
+  flex: 1;
+}
+
+.weather-info .weather-temp {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.weather-info .weather-details {
+  display: flex;
+  gap: 0.75rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.weather-info .weather-details span {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.aqi-section {
+  padding: 0.75rem;
+  border-radius: var(--radius-sm);
+}
+
+.aqi-section.success {
+  background: rgba(52, 211, 153, 0.1);
+}
+
+.aqi-section.warning {
+  background: rgba(251, 191, 36, 0.1);
+}
+
+.aqi-section.error {
+  background: rgba(248, 113, 113, 0.1);
+}
+
+.aqi-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.375rem;
+}
+
+.aqi-label {
+  font-weight: 500;
+  font-size: 0.85rem;
+}
+
+.aqi-badge {
+  margin-left: auto;
+  padding: 0.125rem 0.5rem;
+  border-radius: 1rem;
+  font-size: 0.7rem;
+  font-weight: 500;
+}
+
+.aqi-badge.success {
+  background: var(--success);
+  color: white;
+}
+
+.aqi-badge.warning {
+  background: var(--warning);
+  color: #000;
+}
+
+.aqi-badge.error {
+  background: var(--error);
+  color: white;
+}
+
+.aqi-advice {
+  font-size: 0.8rem;
+  margin: 0 0 0.5rem;
+}
+
+.aqi-details {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+/* ==================== METRIC PROGRESS ==================== */
+.metric-icon.water {
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+}
+
+.metric-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+}
+
+.mini-progress {
+  flex: 1;
+  height: 4px;
+  background: var(--bg-elevated);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.mini-progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+}
+
+.quick-action-btn.secondary {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
 }
 
 /* ==================== ENHANCED DASHBOARD ==================== */

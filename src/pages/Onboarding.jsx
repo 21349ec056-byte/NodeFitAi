@@ -1,11 +1,16 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { ChevronRight, ChevronLeft, User, Heart, Target, Activity, Sparkles } from 'lucide-react';
+import {
+    ChevronRight, ChevronLeft, User, Heart, Target, Activity,
+    Sparkles, Utensils, Moon, Smartphone, Dumbbell, Coffee
+} from 'lucide-react';
 
 const STEPS = [
     { id: 'basic', title: 'Basic Info', icon: User },
     { id: 'body', title: 'Body Metrics', icon: Activity },
+    { id: 'habits', title: 'Lifestyle', icon: Coffee },
+    { id: 'health', title: 'Health Data', icon: Heart },
     { id: 'goal', title: 'Your Goal', icon: Target },
 ];
 
@@ -15,6 +20,10 @@ const GOALS = [
     'General Wellness', 'Other'
 ];
 
+const DIET_TYPES = ['Vegetarian', 'Vegan', 'Non-Veg', 'Keto', 'Paleo', 'Mediterranean', 'No Preference'];
+const ACTIVITY_LEVELS = ['Sedentary', 'Lightly Active', 'Moderately Active', 'Very Active', 'Athlete'];
+const SLEEP_QUALITY = ['Poor', 'Fair', 'Good', 'Excellent'];
+
 export default function Onboarding() {
     const { setupProfile } = useAuth();
     const navigate = useNavigate();
@@ -22,17 +31,51 @@ export default function Onboarding() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showCustomGoal, setShowCustomGoal] = useState(false);
     const [formData, setFormData] = useState({
+        // Basic
         name: '',
         gender: '',
         age: '',
+        // Body
         height: '',
         weight: '',
+        // Lifestyle habits
+        dietType: '',
+        mealsPerDay: '3',
+        waterIntake: '4',
+        caffeineIntake: '2',
+        alcoholFrequency: 'Rarely',
+        smokingStatus: 'Never',
+        // Screen & Activity
+        screenTime: '4',
+        activityLevel: '',
+        exerciseFrequency: '3',
+        sleepHours: '7',
+        sleepQuality: '',
+        // Health data (manual or from wearable)
+        avgSteps: '',
+        avgHeartRate: '',
+        hasWearable: false,
+        wearableType: '',
+        // Medical
+        medicalConditions: '',
+        allergies: '',
+        medications: '',
+        // Goal
         goal: '',
         customGoal: '',
+        targetWeight: '',
+        substanceUse: 'Never',
     });
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
+        const { name, value, type, checked } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: type === 'checkbox' ? checked : value
+        }));
+    };
+
+    const handleSelect = (name, value) => {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
@@ -47,20 +90,14 @@ export default function Onboarding() {
     };
 
     const handleNext = () => {
-        if (step < STEPS.length - 1) {
-            setStep(s => s + 1);
-        }
+        if (step < STEPS.length - 1) setStep(s => s + 1);
     };
 
     const handleBack = () => {
-        if (step > 0) {
-            setStep(s => s - 1);
-        }
+        if (step > 0) setStep(s => s - 1);
     };
 
-    const handleSkip = () => {
-        navigate('/app/dashboard');
-    };
+    const handleSkip = () => navigate('/app/dashboard');
 
     const handleSubmit = async () => {
         setIsSubmitting(true);
@@ -101,6 +138,7 @@ export default function Onboarding() {
                         <h2>{STEPS[step].title}</h2>
                     </div>
 
+                    {/* Step 1: Basic Info */}
                     {step === 0 && (
                         <div className="step-form fade-in">
                             <div className="form-group">
@@ -116,37 +154,37 @@ export default function Onboarding() {
                             </div>
                             <div className="form-group">
                                 <label>Gender</label>
-                                <div className="gender-options">
+                                <div className="option-grid-3">
                                     {['Male', 'Female', 'Other'].map(g => (
                                         <button
                                             type="button"
                                             key={g}
                                             className={`option-btn ${formData.gender === g ? 'selected' : ''}`}
-                                            onClick={() => setFormData(prev => ({ ...prev, gender: g }))}
+                                            onClick={() => handleSelect('gender', g)}
                                         >
-                                            {g === 'Female' && <Heart size={16} />}
                                             {g}
                                         </button>
                                     ))}
                                 </div>
                             </div>
+                            <div className="form-group">
+                                <label>Age</label>
+                                <input
+                                    type="number"
+                                    name="age"
+                                    placeholder="25"
+                                    value={formData.age}
+                                    onChange={handleChange}
+                                    className="input-field"
+                                />
+                            </div>
                         </div>
                     )}
 
+                    {/* Step 2: Body Metrics */}
                     {step === 1 && (
                         <div className="step-form fade-in">
-                            <div className="form-row">
-                                <div className="form-group">
-                                    <label>Age</label>
-                                    <input
-                                        type="number"
-                                        name="age"
-                                        placeholder="25"
-                                        value={formData.age}
-                                        onChange={handleChange}
-                                        className="input-field"
-                                    />
-                                </div>
+                            <div className="form-row-2">
                                 <div className="form-group">
                                     <label>Height (cm)</label>
                                     <input
@@ -159,7 +197,7 @@ export default function Onboarding() {
                                     />
                                 </div>
                                 <div className="form-group">
-                                    <label>Weight (kg)</label>
+                                    <label>Current Weight (kg)</label>
                                     <input
                                         type="number"
                                         name="weight"
@@ -170,10 +208,194 @@ export default function Onboarding() {
                                     />
                                 </div>
                             </div>
+                            <div className="form-group">
+                                <label>Target Weight (kg) - Optional</label>
+                                <input
+                                    type="number"
+                                    name="targetWeight"
+                                    placeholder="60"
+                                    value={formData.targetWeight}
+                                    onChange={handleChange}
+                                    className="input-field"
+                                />
+                            </div>
                         </div>
                     )}
 
+                    {/* Step 3: Lifestyle & Habits */}
                     {step === 2 && (
+                        <div className="step-form fade-in">
+                            <div className="form-group">
+                                <label><Utensils size={16} /> Diet Type</label>
+                                <div className="option-grid-wrap">
+                                    {DIET_TYPES.map(d => (
+                                        <button
+                                            type="button"
+                                            key={d}
+                                            className={`option-btn-sm ${formData.dietType === d ? 'selected' : ''}`}
+                                            onClick={() => handleSelect('dietType', d)}
+                                        >
+                                            {d}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="form-row-2">
+                                <div className="form-group">
+                                    <label>Meals per day</label>
+                                    <input
+                                        type="number"
+                                        name="mealsPerDay"
+                                        value={formData.mealsPerDay}
+                                        onChange={handleChange}
+                                        className="input-field"
+                                        min="1"
+                                        max="10"
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Water (glasses/day)</label>
+                                    <input
+                                        type="number"
+                                        name="waterIntake"
+                                        value={formData.waterIntake}
+                                        onChange={handleChange}
+                                        className="input-field"
+                                    />
+                                </div>
+                            </div>
+                            <div className="form-row-2">
+                                <div className="form-group">
+                                    <label><Coffee size={16} /> Caffeine (cups/day)</label>
+                                    <input
+                                        type="number"
+                                        name="caffeineIntake"
+                                        value={formData.caffeineIntake}
+                                        onChange={handleChange}
+                                        className="input-field"
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label><Smartphone size={16} /> Screen time (hrs)</label>
+                                    <input
+                                        type="number"
+                                        name="screenTime"
+                                        value={formData.screenTime}
+                                        onChange={handleChange}
+                                        className="input-field"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Step 4: Health Data */}
+                    {step === 3 && (
+                        <div className="step-form fade-in">
+                            <div className="form-group">
+                                <label><Dumbbell size={16} /> Activity Level</label>
+                                <div className="option-grid-wrap">
+                                    {ACTIVITY_LEVELS.map(a => (
+                                        <button
+                                            type="button"
+                                            key={a}
+                                            className={`option-btn-sm ${formData.activityLevel === a ? 'selected' : ''}`}
+                                            onClick={() => handleSelect('activityLevel', a)}
+                                        >
+                                            {a}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="form-row-2">
+                                <div className="form-group">
+                                    <label>Exercise (days/week)</label>
+                                    <input
+                                        type="number"
+                                        name="exerciseFrequency"
+                                        value={formData.exerciseFrequency}
+                                        onChange={handleChange}
+                                        className="input-field"
+                                        min="0"
+                                        max="7"
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label><Moon size={16} /> Sleep (hrs/night)</label>
+                                    <input
+                                        type="number"
+                                        name="sleepHours"
+                                        value={formData.sleepHours}
+                                        onChange={handleChange}
+                                        className="input-field"
+                                    />
+                                </div>
+                            </div>
+                            <div className="form-group">
+                                <label>Sleep Quality</label>
+                                <div className="option-grid-4">
+                                    {SLEEP_QUALITY.map(q => (
+                                        <button
+                                            type="button"
+                                            key={q}
+                                            className={`option-btn-sm ${formData.sleepQuality === q ? 'selected' : ''}`}
+                                            onClick={() => handleSelect('sleepQuality', q)}
+                                        >
+                                            {q}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="form-row-2">
+                                <div className="form-group">
+                                    <label>Avg Daily Steps</label>
+                                    <input
+                                        type="number"
+                                        name="avgSteps"
+                                        placeholder="5000"
+                                        value={formData.avgSteps}
+                                        onChange={handleChange}
+                                        className="input-field"
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label><Heart size={16} /> Resting Heart Rate</label>
+                                    <input
+                                        type="number"
+                                        name="avgHeartRate"
+                                        placeholder="72"
+                                        value={formData.avgHeartRate}
+                                        onChange={handleChange}
+                                        className="input-field"
+                                    />
+                                </div>
+                            </div>
+                            <div className="form-group checkbox-group">
+                                <label>
+                                    <input
+                                        type="checkbox"
+                                        name="hasWearable"
+                                        checked={formData.hasWearable}
+                                        onChange={handleChange}
+                                    />
+                                    I have a fitness wearable/smartwatch
+                                </label>
+                                {formData.hasWearable && (
+                                    <input
+                                        type="text"
+                                        name="wearableType"
+                                        placeholder="e.g., Apple Watch, Fitbit, Garmin"
+                                        value={formData.wearableType}
+                                        onChange={handleChange}
+                                        className="input-field mt-1"
+                                    />
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Step 5: Goal & Habits */}
+                    {step === 4 && (
                         <div className="step-form fade-in">
                             <div className="form-group">
                                 <label>What's your primary health goal?</label>
@@ -201,15 +423,89 @@ export default function Onboarding() {
                                     />
                                 )}
                             </div>
+
+                            <div className="habits-section">
+                                <h3 className="section-subtitle">Your Habits</h3>
+                                <p className="text-muted small">This helps us personalize health advice</p>
+
+                                <div className="form-group">
+                                    <label>🍷 Alcohol Consumption</label>
+                                    <div className="option-grid-wrap">
+                                        {['Never', 'Rarely', 'Occasionally', 'Weekly', 'Daily'].map(opt => (
+                                            <button
+                                                type="button"
+                                                key={opt}
+                                                className={`option-btn-sm ${formData.alcoholFrequency === opt ? 'selected' : ''}`}
+                                                onClick={() => handleSelect('alcoholFrequency', opt)}
+                                            >
+                                                {opt}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="form-group">
+                                    <label>🚬 Smoking Status</label>
+                                    <div className="option-grid-wrap">
+                                        {['Never', 'Former', 'Occasional', 'Regular'].map(opt => (
+                                            <button
+                                                type="button"
+                                                key={opt}
+                                                className={`option-btn-sm ${formData.smokingStatus === opt ? 'selected' : ''}`}
+                                                onClick={() => handleSelect('smokingStatus', opt)}
+                                            >
+                                                {opt}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="form-group">
+                                    <label>💊 Recreational Substance Use</label>
+                                    <div className="option-grid-wrap">
+                                        {['Never', 'Former', 'Occasional', 'Regular'].map(opt => (
+                                            <button
+                                                type="button"
+                                                key={opt}
+                                                className={`option-btn-sm ${formData.substanceUse === opt ? 'selected' : ''}`}
+                                                onClick={() => handleSelect('substanceUse', opt)}
+                                            >
+                                                {opt}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="form-group">
+                                <label>Any medical conditions? (Optional)</label>
+                                <textarea
+                                    name="medicalConditions"
+                                    placeholder="e.g., Diabetes, Hypertension..."
+                                    value={formData.medicalConditions}
+                                    onChange={handleChange}
+                                    className="input-field"
+                                    rows="2"
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>Food allergies? (Optional)</label>
+                                <input
+                                    type="text"
+                                    name="allergies"
+                                    placeholder="e.g., Peanuts, Gluten..."
+                                    value={formData.allergies}
+                                    onChange={handleChange}
+                                    className="input-field"
+                                />
+                            </div>
                         </div>
                     )}
                 </div>
 
                 {/* Actions */}
                 <div className="onboarding-actions">
-                    <button className="btn-text" onClick={handleSkip}>
-                        Skip for now
-                    </button>
+                    <div className="step-indicator">Step {step + 1} of {STEPS.length}</div>
                     <div className="action-buttons">
                         {step > 0 && (
                             <button className="btn-secondary" onClick={handleBack}>
