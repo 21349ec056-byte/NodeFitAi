@@ -81,20 +81,30 @@ export default function FoodCamera() {
             const base64Data = capturedImage.split(',')[1];
             const mimeType = capturedImage.split(';')[0].split(':')[1] || 'image/jpeg';
 
-            const prompt = `Analyze this food image and return ONLY valid JSON:
-      {
-        "foodName": "Name of the dish",
-        "ingredients": ["ingredient1", "ingredient2"],
-        "estimatedCalories": 350,
-        "nutritionScore": "Good/Fair/Poor",
-        "healthAnalysis": "Brief analysis",
-        "goalAlignment": {
-          "goal": "${profile?.goal || 'General Wellness'}",
-          "isAligned": true,
-          "reason": "Why it helps or hurts your goal"
-        },
-        "recommendations": ["Tip 1", "Tip 2"]
-      }`;
+            const userAllergies = profile?.allergies || '';
+
+            const prompt = `Analyze this food image and return ONLY valid JSON.
+${userAllergies ? `IMPORTANT: The user is ALLERGIC to: ${userAllergies}. Check if ANY ingredients might contain these allergens!` : ''}
+
+{
+  "foodName": "Name of the dish",
+  "ingredients": ["ingredient1", "ingredient2"],
+  "estimatedCalories": 350,
+  "nutritionScore": "Good/Fair/Poor",
+  "healthAnalysis": "Brief analysis",
+  "allergyWarning": {
+    "hasAllergen": ${userAllergies ? 'true/false based on ingredients' : 'false'},
+    "allergens": ["list of detected allergens that user is allergic to"],
+    "severity": "High/Medium/Low",
+    "message": "Warning message if allergens detected"
+  },
+  "goalAlignment": {
+    "goal": "${profile?.goal || 'General Wellness'}",
+    "isAligned": true,
+    "reason": "Why it helps or hurts your goal"
+  },
+  "recommendations": ["Tip 1", "Tip 2"]
+}`;
 
             const result = await model.generateContent([
                 prompt,
@@ -242,6 +252,22 @@ export default function FoodCamera() {
                         <h3>Health Analysis</h3>
                         <p>{analysis.healthAnalysis}</p>
                     </div>
+
+                    {/* Allergy Warning */}
+                    {analysis.allergyWarning?.hasAllergen && (
+                        <div className="allergy-warning">
+                            <div className="allergy-header">
+                                <AlertTriangle size={24} />
+                                <span>⚠️ ALLERGY ALERT!</span>
+                            </div>
+                            <p className="allergy-message">{analysis.allergyWarning.message}</p>
+                            <div className="allergy-tags">
+                                {analysis.allergyWarning.allergens?.map((allergen, i) => (
+                                    <span key={i} className="allergen-tag">{allergen}</span>
+                                ))}
+                            </div>
+                        </div>
+                    )}
 
                     <div className={`goal-card ${analysis.goalAlignment.isAligned ? 'success' : 'warning'}`}>
                         <div className="goal-status">

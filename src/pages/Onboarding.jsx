@@ -59,12 +59,25 @@ export default function Onboarding() {
         // Medical
         medicalConditions: '',
         allergies: '',
-        medications: '',
+        medications: [],
         // Goal
         goal: '',
         customGoal: '',
         targetWeight: '',
         substanceUse: 'Never',
+        // Accessibility
+        hasDisability: false,
+        disabilityDetails: '',
+        hasJobConstraints: false,
+        hasChronicCondition: false,
+        chronicConditionDetails: '',
+        // Medical files
+        medicalFileName: '',
+        medicalFileData: '',
+        // Skincare
+        skinType: '',
+        skinConcerns: [],
+        usesSunscreen: false,
     });
 
     const handleChange = (e) => {
@@ -286,6 +299,66 @@ export default function Onboarding() {
                                     />
                                 </div>
                             </div>
+
+                            {/* Skincare Section */}
+                            <div className="skincare-section">
+                                <h3 className="section-subtitle">✨ Skincare</h3>
+                                <p className="text-muted small">Help us provide personalized skin protection tips</p>
+
+                                <div className="form-group">
+                                    <label>Skin Type</label>
+                                    <div className="option-grid-wrap">
+                                        {['Dry', 'Oily', 'Combination', 'Normal', 'Sensitive'].map(type => (
+                                            <button
+                                                type="button"
+                                                key={type}
+                                                className={`option-btn-sm ${formData.skinType === type ? 'selected' : ''}`}
+                                                onClick={() => handleSelect('skinType', type)}
+                                            >
+                                                {type}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="form-group">
+                                    <label>Skin Concerns (select all that apply)</label>
+                                    <div className="option-grid-wrap">
+                                        {['Acne', 'Aging', 'Dark Spots', 'Dryness', 'Oiliness', 'Sensitivity', 'None'].map(concern => (
+                                            <button
+                                                type="button"
+                                                key={concern}
+                                                className={`option-btn-sm ${formData.skinConcerns?.includes(concern) ? 'selected' : ''}`}
+                                                onClick={() => {
+                                                    const current = formData.skinConcerns || [];
+                                                    if (concern === 'None') {
+                                                        setFormData(prev => ({ ...prev, skinConcerns: ['None'] }));
+                                                    } else {
+                                                        const updated = current.includes(concern)
+                                                            ? current.filter(c => c !== concern)
+                                                            : [...current.filter(c => c !== 'None'), concern];
+                                                        setFormData(prev => ({ ...prev, skinConcerns: updated }));
+                                                    }
+                                                }}
+                                            >
+                                                {concern}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="form-group checkbox-group">
+                                    <label>
+                                        <input
+                                            type="checkbox"
+                                            name="usesSunscreen"
+                                            checked={formData.usesSunscreen}
+                                            onChange={handleChange}
+                                        />
+                                        I regularly use sunscreen
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                     )}
 
@@ -391,6 +464,68 @@ export default function Onboarding() {
                                     />
                                 )}
                             </div>
+
+                            {/* Accessibility Section */}
+                            <div className="accessibility-section">
+                                <h3 className="section-subtitle">♿ Accessibility & Special Considerations</h3>
+                                <p className="text-muted small">Help us personalize recommendations for your situation</p>
+
+                                <div className="form-group checkbox-group">
+                                    <label>
+                                        <input
+                                            type="checkbox"
+                                            name="hasDisability"
+                                            checked={formData.hasDisability}
+                                            onChange={handleChange}
+                                        />
+                                        I have a physical disability or mobility limitation
+                                    </label>
+                                    {formData.hasDisability && (
+                                        <input
+                                            type="text"
+                                            name="disabilityDetails"
+                                            placeholder="Tell us more so we can adapt recommendations..."
+                                            value={formData.disabilityDetails}
+                                            onChange={handleChange}
+                                            className="input-field mt-1"
+                                        />
+                                    )}
+                                </div>
+
+                                <div className="form-group checkbox-group">
+                                    <label>
+                                        <input
+                                            type="checkbox"
+                                            name="hasJobConstraints"
+                                            checked={formData.hasJobConstraints}
+                                            onChange={handleChange}
+                                        />
+                                        My job requires extended screen time (IT, Developer, etc.)
+                                    </label>
+                                </div>
+
+                                <div className="form-group checkbox-group">
+                                    <label>
+                                        <input
+                                            type="checkbox"
+                                            name="hasChronicCondition"
+                                            checked={formData.hasChronicCondition}
+                                            onChange={handleChange}
+                                        />
+                                        I have a chronic health condition affecting activity
+                                    </label>
+                                    {formData.hasChronicCondition && (
+                                        <input
+                                            type="text"
+                                            name="chronicConditionDetails"
+                                            placeholder="e.g., Arthritis, Chronic fatigue, etc."
+                                            value={formData.chronicConditionDetails}
+                                            onChange={handleChange}
+                                            className="input-field mt-1"
+                                        />
+                                    )}
+                                </div>
+                            </div>
                         </div>
                     )}
 
@@ -493,11 +628,120 @@ export default function Onboarding() {
                                 <input
                                     type="text"
                                     name="allergies"
-                                    placeholder="e.g., Peanuts, Gluten..."
+                                    placeholder="e.g., Peanuts, Gluten, Shellfish..."
                                     value={formData.allergies}
                                     onChange={handleChange}
                                     className="input-field"
                                 />
+                                <p className="text-muted small mt-1">We'll warn you when scanned food contains these allergens</p>
+                            </div>
+
+                            {/* Medical File Upload */}
+                            <div className="medical-upload-section">
+                                <h3 className="section-subtitle">📄 Medical Documents (Optional)</h3>
+                                <p className="text-muted small">Upload prescriptions, lab reports, or health records for reference</p>
+                                <div className="form-group">
+                                    <label className="file-upload-label">
+                                        <input
+                                            type="file"
+                                            accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                                            onChange={(e) => {
+                                                const file = e.target.files?.[0];
+                                                if (file) {
+                                                    const reader = new FileReader();
+                                                    reader.onload = (event) => {
+                                                        setFormData(prev => ({
+                                                            ...prev,
+                                                            medicalFileName: file.name,
+                                                            medicalFileData: event.target.result
+                                                        }));
+                                                    };
+                                                    reader.readAsDataURL(file);
+                                                }
+                                            }}
+                                            style={{ display: 'none' }}
+                                        />
+                                        <div className="upload-box">
+                                            {formData.medicalFileName ? (
+                                                <>
+                                                    <span className="upload-success">✓ {formData.medicalFileName}</span>
+                                                    <button
+                                                        type="button"
+                                                        className="btn-text-sm"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            setFormData(prev => ({ ...prev, medicalFileName: '', medicalFileData: '' }));
+                                                        }}
+                                                    >
+                                                        Remove
+                                                    </button>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <span className="upload-icon">📎</span>
+                                                    <span>Click to upload medical document</span>
+                                                    <span className="upload-hint">PDF, Images, or Documents</span>
+                                                </>
+                                            )}
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            {/* Medication Reminders */}
+                            <div className="medication-section">
+                                <h3 className="section-subtitle">💊 Medication Reminders (Optional)</h3>
+                                <p className="text-muted small">Add medications you take regularly and we'll remind you</p>
+
+                                {(formData.medications || []).map((med, index) => (
+                                    <div key={index} className="medication-row">
+                                        <input
+                                            type="text"
+                                            placeholder="Medication name"
+                                            value={med.name}
+                                            onChange={(e) => {
+                                                const updated = [...(formData.medications || [])];
+                                                updated[index] = { ...updated[index], name: e.target.value };
+                                                setFormData(prev => ({ ...prev, medications: updated }));
+                                            }}
+                                            className="input-field"
+                                        />
+                                        <input
+                                            type="time"
+                                            value={med.time}
+                                            onChange={(e) => {
+                                                const updated = [...(formData.medications || [])];
+                                                updated[index] = { ...updated[index], time: e.target.value };
+                                                setFormData(prev => ({ ...prev, medications: updated }));
+                                            }}
+                                            className="input-field time-input"
+                                        />
+                                        <button
+                                            type="button"
+                                            className="btn-icon-sm remove"
+                                            onClick={() => {
+                                                const updated = (formData.medications || []).filter((_, i) => i !== index);
+                                                setFormData(prev => ({ ...prev, medications: updated }));
+                                            }}
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+                                ))}
+
+                                <button
+                                    type="button"
+                                    className="btn-secondary btn-sm"
+                                    onClick={() => {
+                                        const current = formData.medications || [];
+                                        setFormData(prev => ({
+                                            ...prev,
+                                            medications: [...current, { name: '', time: '08:00' }]
+                                        }));
+                                    }}
+                                >
+                                    + Add Medication
+                                </button>
                             </div>
                         </div>
                     )}

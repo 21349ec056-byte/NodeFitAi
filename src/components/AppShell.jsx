@@ -64,7 +64,7 @@ export default function AppShell() {
                             onClick={closeSidebar}
                         >
                             <Heart size={20} />
-                            <span>Cycle Tracker</span>
+                            <span>Menstrual Cycle</span>
                         </NavLink>
                     )}
                 </nav>

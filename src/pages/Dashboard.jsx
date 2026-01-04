@@ -138,6 +138,13 @@ HABITS (IMPORTANT - tailor advice based on these):
 - Smoking: ${profile?.smokingStatus || 'Unknown'}
 - Substance Use: ${profile?.substanceUse || 'Unknown'}
 
+ACCESSIBILITY & CONSTRAINTS (VERY IMPORTANT - adapt recommendations accordingly):
+- Has Physical Disability: ${profile?.hasDisability ? 'Yes - ' + (profile.disabilityDetails || 'Not specified') : 'No'}
+- Job Requires Screen Time: ${profile?.hasJobConstraints ? 'Yes (IT/Developer/Office work)' : 'No'}
+- Has Chronic Condition: ${profile?.hasChronicCondition ? 'Yes - ' + (profile.chronicConditionDetails || 'Not specified') : 'No'}
+${profile?.hasDisability || profile?.hasChronicCondition ? '⚠️ Please provide accessible alternatives for physical activities!' : ''}
+${profile?.hasJobConstraints ? '⚠️ Do not suggest reducing screen time, instead suggest breaks and eye care!' : ''}
+
 HEALTH INFO:
 - Has Wearable: ${profile?.hasWearable ? 'Yes - ' + profile.wearableType : 'No'}
 - Medical Conditions: ${profile?.medicalConditions || 'None specified'}
@@ -190,6 +197,101 @@ Return ONLY valid JSON:
     const stepsProgress = Math.round((metrics.steps.value / metrics.steps.goal) * 100);
     const waterProgress = Math.round((metrics.water.value / metrics.water.goal) * 100);
 
+    // Share badge on social media
+    const shareBadge = (badge) => {
+        const text = `🏆 I just earned the "${badge.name}" badge on nodeFit AI! ${badge.icon}\n\n${badge.desc}\n\nTrack your health journey too! #nodeFitAI #HealthGoals`;
+
+        if (navigator.share) {
+            navigator.share({
+                title: `nodeFit AI - ${badge.name} Badge`,
+                text: text,
+            }).catch(console.error);
+        } else {
+            // Fallback: Copy to clipboard and open Twitter
+            navigator.clipboard.writeText(text);
+            window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
+        }
+    };
+
+    // Export health report
+    const exportReport = () => {
+        const report = `
+╔══════════════════════════════════════════════════════════╗
+║                    nodeFit AI Health Report              ║
+╚══════════════════════════════════════════════════════════╝
+
+📅 Generated: ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}
+👤 User: ${displayName}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📊 HEALTH METRICS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+❤️  Heart Rate:     ${metrics.heartRate.value} ${metrics.heartRate.unit}
+🚶  Steps:          ${metrics.steps.value.toLocaleString()} / ${metrics.steps.goal} (${stepsProgress}%)
+😴  Sleep:          ${metrics.sleep.value} ${metrics.sleep.unit} (${metrics.sleep.quality})
+💧  Water:          ${metrics.water.value} / ${metrics.water.goal} glasses (${waterProgress}%)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎯 USER PROFILE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Goal:           ${profile?.goal || 'Not set'}
+Age:            ${profile?.age || 'Not specified'}
+Gender:         ${profile?.gender || 'Not specified'}
+Height:         ${profile?.height || 'Not specified'} cm
+Weight:         ${profile?.weight || 'Not specified'} kg
+Activity Level: ${profile?.activityLevel || 'Not specified'}
+Diet Type:      ${profile?.dietType || 'Not specified'}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔥 STREAK & ACHIEVEMENTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Current Streak: ${streak.current} days
+Longest Streak: ${streak.longest} days
+Meals Logged:   ${recentMeals.length}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🧠 AI HEALTH SUMMARY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${aiSummary || 'No AI summary generated yet.'}
+
+Health Score: ${insights?.healthScore || 'N/A'}/100
+
+✅ DO'S:
+${insights?.dos?.map(d => `   • ${d}`).join('\n') || '   • Not available'}
+
+❌ DON'TS:
+${insights?.donts?.map(d => `   • ${d}`).join('\n') || '   • Not available'}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🌤️ ENVIRONMENTAL CONDITIONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${weather ? `Temperature: ${weather.temp}°C
+Humidity: ${weather.humidity}%
+Wind: ${weather.wind} km/h
+UV Index: ${weather.uv}` : 'Weather data not available'}
+
+${aqi ? `Air Quality Index: ${aqi.value}
+PM2.5: ${aqi.pm25}
+PM10: ${aqi.pm10}` : 'AQI data not available'}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                    Generated by nodeFit AI
+              Your Privacy-First Health Intelligence
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        `;
+
+        // Create and download the file
+        const blob = new Blob([report], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `nodeFit-Health-Report-${new Date().toISOString().split('T')[0]}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    };
+
     const getWeatherIcon = (code) => {
         if (code <= 3) return '☀️';
         if (code <= 49) return '☁️';
@@ -216,6 +318,34 @@ Return ONLY valid JSON:
                     </div>
                 </div>
             </div>
+
+            {/* Medication Reminders */}
+            {profile?.medications?.length > 0 && (
+                <div className="medication-reminder-card">
+                    <div className="reminder-header">
+                        <span>💊 Today's Medications</span>
+                    </div>
+                    <div className="reminder-list">
+                        {profile.medications.map((med, i) => {
+                            const now = new Date();
+                            const [hours, mins] = (med.time || '08:00').split(':').map(Number);
+                            const medTime = new Date();
+                            medTime.setHours(hours, mins, 0);
+                            const isPast = now > medTime;
+                            const isUpcoming = !isPast && (medTime - now) < 3600000; // within 1 hour
+
+                            return (
+                                <div key={i} className={`reminder-item ${isPast ? 'past' : ''} ${isUpcoming ? 'upcoming' : ''}`}>
+                                    <span className="reminder-time">{med.time}</span>
+                                    <span className="reminder-name">{med.name}</span>
+                                    {isPast && <span className="reminder-status taken">✓</span>}
+                                    {isUpcoming && <span className="reminder-status soon">Soon!</span>}
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
 
             {/* AI Summary Card */}
             {aiSummary && (
@@ -270,6 +400,90 @@ Return ONLY valid JSON:
                             </div>
                         </div>
                     )}
+                </div>
+            )}
+
+            {/* Protection Tips Card */}
+            {(weather || aqi) && (
+                <div className="protection-tips-card">
+                    <h3>🛡️ Today's Protection</h3>
+                    <div className="protection-grid">
+                        {/* Sunscreen */}
+                        {weather?.uv >= 3 && (
+                            <div className="protection-item sunscreen">
+                                <span className="protection-icon">🧴</span>
+                                <div className="protection-info">
+                                    <span className="protection-label">Sunscreen</span>
+                                    <span className="protection-status recommended">Recommended</span>
+                                    <span className="protection-reason">
+                                        UV Index: {weather.uv} - {weather.uv >= 8 ? 'Very High! SPF 50+ required' : weather.uv >= 6 ? 'High! Use SPF 30+' : 'Moderate, SPF 15+'}
+                                    </span>
+                                </div>
+                            </div>
+                        )}
+                        {weather?.uv < 3 && weather && (
+                            <div className="protection-item sunscreen optional">
+                                <span className="protection-icon">🧴</span>
+                                <div className="protection-info">
+                                    <span className="protection-label">Sunscreen</span>
+                                    <span className="protection-status optional">Optional</span>
+                                    <span className="protection-reason">UV Index is low ({weather.uv})</span>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Mask */}
+                        {aqi?.value >= 50 && (
+                            <div className="protection-item mask">
+                                <span className="protection-icon">😷</span>
+                                <div className="protection-info">
+                                    <span className="protection-label">Face Mask</span>
+                                    <span className={`protection-status ${aqi.value >= 100 ? 'required' : 'recommended'}`}>
+                                        {aqi.value >= 100 ? 'Required' : 'Recommended'}
+                                    </span>
+                                    <span className="protection-reason">
+                                        {aqi.value >= 150 ? 'Air quality is unhealthy - N95 mask advised' :
+                                            aqi.value >= 100 ? 'Moderate pollution - Use mask outdoors' :
+                                                'Light pollution - Mask recommended for sensitive individuals'}
+                                    </span>
+                                </div>
+                            </div>
+                        )}
+                        {aqi?.value < 50 && aqi && (
+                            <div className="protection-item mask optional">
+                                <span className="protection-icon">😷</span>
+                                <div className="protection-info">
+                                    <span className="protection-label">Face Mask</span>
+                                    <span className="protection-status good">Not Needed</span>
+                                    <span className="protection-reason">Air quality is good today</span>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Hydration based on heat */}
+                        {weather?.temp >= 30 && (
+                            <div className="protection-item hydration">
+                                <span className="protection-icon">💧</span>
+                                <div className="protection-info">
+                                    <span className="protection-label">Extra Hydration</span>
+                                    <span className="protection-status required">Required</span>
+                                    <span className="protection-reason">High temperature ({weather.temp}°C) - Drink extra water</span>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Umbrella/Rain gear */}
+                        {weather?.code >= 50 && weather?.code <= 99 && (
+                            <div className="protection-item rain">
+                                <span className="protection-icon">☔</span>
+                                <div className="protection-info">
+                                    <span className="protection-label">Rain Protection</span>
+                                    <span className="protection-status recommended">Carry Umbrella</span>
+                                    <span className="protection-reason">Rain expected today</span>
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </div>
             )}
 
@@ -440,6 +654,98 @@ Return ONLY valid JSON:
                     </div>
                 </div>
             )}
+
+            {/* Food Suggestions */}
+            <div className="suggestions-section">
+                <div className="section-header">
+                    <h2>🍽️ Today's Food Suggestions</h2>
+                </div>
+                <div className="suggestions-grid">
+                    {(insights?.foodSuggestions || [
+                        { meal: 'Breakfast', suggestion: 'Oatmeal with berries and nuts', calories: '350 kcal', icon: '🥣' },
+                        { meal: 'Lunch', suggestion: 'Grilled chicken salad', calories: '450 kcal', icon: '🥗' },
+                        { meal: 'Dinner', suggestion: 'Salmon with vegetables', calories: '500 kcal', icon: '🐟' },
+                        { meal: 'Snack', suggestion: 'Greek yogurt with honey', calories: '150 kcal', icon: '🍯' },
+                    ]).map((item, i) => (
+                        <div key={i} className="suggestion-card">
+                            <span className="suggestion-icon">{item.icon}</span>
+                            <div className="suggestion-info">
+                                <span className="suggestion-meal">{item.meal}</span>
+                                <span className="suggestion-food">{item.suggestion}</span>
+                                <span className="suggestion-cal">{item.calories}</span>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* Week Planner */}
+            <div className="planner-section">
+                <div className="section-header">
+                    <h2>📅 This Week's Plan</h2>
+                </div>
+                <div className="planner-grid">
+                    {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, i) => {
+                        const jsDay = new Date().getDay(); // 0=Sun, 1=Mon, ...6=Sat
+                        // Convert JS day to Mon=0, Tue=1, ...Sun=6
+                        const todayIndex = jsDay === 0 ? 6 : jsDay - 1;
+                        const isToday = i === todayIndex;
+                        const isPast = i < todayIndex;
+                        return (
+                            <div key={day} className={`planner-day ${isToday ? 'today' : ''} ${isPast ? 'completed' : ''}`}>
+                                <span className="day-name">{day}</span>
+                                <div className="day-tasks">
+                                    {isToday && <span className="day-badge">Today</span>}
+                                    {isPast && <Check size={14} className="completed-icon" />}
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+
+            {/* Badges & Achievements */}
+            <div className="badges-section">
+                <div className="section-header">
+                    <h2>🏆 Your Achievements</h2>
+                </div>
+                <div className="badges-grid">
+                    {[
+                        { name: 'Early Bird', icon: '🌅', unlocked: streak.current >= 3, desc: '3-day streak' },
+                        { name: 'Week Warrior', icon: '⚔️', unlocked: streak.current >= 7, desc: '7-day streak' },
+                        { name: 'Food Logger', icon: '📸', unlocked: recentMeals.length >= 5, desc: 'Log 5 meals' },
+                        { name: 'Hydration Hero', icon: '💧', unlocked: metrics.water.value >= 8, desc: 'Drink 8 glasses' },
+                    ].map((badge, i) => (
+                        <div key={i} className={`badge-card ${badge.unlocked ? 'unlocked' : 'locked'}`}>
+                            <span className="badge-icon">{badge.icon}</span>
+                            <span className="badge-name">{badge.name}</span>
+                            <span className="badge-desc">{badge.desc}</span>
+                            {badge.unlocked && (
+                                <button
+                                    className="share-badge-btn"
+                                    onClick={() => shareBadge(badge)}
+                                    title="Share on social media"
+                                >
+                                    📤
+                                </button>
+                            )}
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* Export Report */}
+            <div className="export-section">
+                <div className="section-header">
+                    <h2>📊 Health Report</h2>
+                </div>
+                <div className="export-card">
+                    <p>Download your personalized health report with insights, metrics, and recommendations.</p>
+                    <button className="btn-primary" onClick={exportReport}>
+                        📥 Export Report (PDF)
+                    </button>
+                </div>
+            </div>
 
             {/* Complete Profile Prompt */}
             {!profile && (
